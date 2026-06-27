@@ -1,0 +1,138 @@
+-- 1. Create Hospital Table
+CREATE TABLE Hospital (
+    hospital_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    city VARCHAR(100),
+    area VARCHAR(100),
+    contact_info VARCHAR(100)
+);
+
+-- 2. Create Users Table
+CREATE TABLE Users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    user_type ENUM('Admin', 'Patient', 'Staff') NOT NULL
+);
+
+-- 3. Create Admins Table
+CREATE TABLE Admins (
+    user_id INT PRIMARY KEY,
+    address TEXT,
+    contact_number VARCHAR(20),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
+);
+
+-- 4. Create Patients Table
+CREATE TABLE Patients (
+    user_id INT PRIMARY KEY,
+    address TEXT,
+    email VARCHAR(100) UNIQUE,
+    contact_number VARCHAR(20),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
+);
+
+-- 5. Create Staff Table
+CREATE TABLE Staff (
+    user_id INT PRIMARY KEY,
+    hospital_id INT NOT NULL,
+    contact_number VARCHAR(20),
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (hospital_id) REFERENCES Hospital(hospital_id) ON DELETE CASCADE
+);
+
+-- 6. Create Doctors Table
+CREATE TABLE Doctors (
+    doctor_id INT PRIMARY KEY AUTO_INCREMENT,
+    doctor_name VARCHAR(255) NOT NULL,
+    department_name VARCHAR(100),
+    fee DECIMAL(10, 2),
+    hospital_id INT NOT NULL,
+    FOREIGN KEY (hospital_id) REFERENCES Hospital(hospital_id) ON DELETE CASCADE
+);
+
+-- 7. Create Beds Table
+CREATE TABLE Beds (
+    bed_id INT PRIMARY KEY AUTO_INCREMENT,
+    bed_type VARCHAR(100),
+    total_count INT DEFAULT 0,
+    available_count INT DEFAULT 0,
+    cost_per_day DECIMAL(10,2),
+    hospital_id INT NOT NULL,
+    FOREIGN KEY (hospital_id) REFERENCES Hospital(hospital_id) ON DELETE CASCADE
+);
+
+-- 8. Create Medicines Table
+CREATE TABLE Medicines (
+    medicine_id INT PRIMARY KEY AUTO_INCREMENT,
+    medicine_name VARCHAR(255) NOT NULL,
+    dosage_time VARCHAR(100),
+    days_left INT,
+    patient_id INT NOT NULL,
+    FOREIGN KEY (patient_id) REFERENCES Patients(user_id) ON DELETE CASCADE
+);
+
+-- 9. Create Prescriptions Table (UPDATED: Removed managed_by_user_id)
+CREATE TABLE Prescriptions (
+    prescription_id INT PRIMARY KEY AUTO_INCREMENT,
+    prescription_date DATE NOT NULL,
+    file_path VARCHAR(500),
+    patient_id INT NOT NULL,
+    FOREIGN KEY (patient_id) REFERENCES Patients(user_id) ON DELETE CASCADE
+);
+
+-- 10. Create Test_Reports Table (UPDATED: Removed staff_id)
+CREATE TABLE Test_Reports (
+    report_id INT PRIMARY KEY AUTO_INCREMENT,
+    test_type VARCHAR(100) NOT NULL,
+    file_path VARCHAR(500),
+    report_date DATE NOT NULL,
+    patient_id INT NOT NULL,
+    FOREIGN KEY (patient_id) REFERENCES Patients(user_id) ON DELETE CASCADE
+);
+
+-- 11. Create Reservations Table
+CREATE TABLE Reservations (
+    reservation_id INT PRIMARY KEY AUTO_INCREMENT,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    status ENUM('Pending', 'Confirmed', 'Cancelled', 'Discharged') DEFAULT 'Pending',
+    patient_id INT NOT NULL,
+    bed_id INT NOT NULL,
+    FOREIGN KEY (patient_id) REFERENCES Patients(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (bed_id) REFERENCES Beds(bed_id) ON DELETE CASCADE
+);
+
+-- 12. Create Appointments Table
+CREATE TABLE Appointments (
+    appointment_id INT PRIMARY KEY AUTO_INCREMENT,
+    appt_date DATE NOT NULL,
+    appt_time_slot VARCHAR(50) NOT NULL,
+    status ENUM('Scheduled', 'Completed', 'Cancelled') DEFAULT 'Scheduled',
+    patient_id INT NOT NULL,
+    doctor_id INT NOT NULL,
+    FOREIGN KEY (patient_id) REFERENCES Patients(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (doctor_id) REFERENCES Doctors(doctor_id) ON DELETE CASCADE
+);
+
+-- 13. Create Payments Table
+CREATE TABLE Payments (
+    payment_id INT PRIMARY KEY AUTO_INCREMENT,
+    amount DECIMAL(10, 2) NOT NULL,
+    payment_date DATE NOT NULL,
+    status ENUM('Paid', 'Unpaid') DEFAULT 'Unpaid',
+    payment_method ENUM('Card', 'Bkash', 'Nagad') NOT NULL,
+    patient_id INT NOT NULL,
+    appointment_id INT,
+    reservation_id INT,
+    report_id INT,
+    FOREIGN KEY (patient_id) REFERENCES Patients(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (appointment_id) REFERENCES Appointments(appointment_id) ON DELETE CASCADE,
+    FOREIGN KEY (reservation_id) REFERENCES Reservations(reservation_id) ON DELETE CASCADE,
+    FOREIGN KEY (report_id) REFERENCES Test_Reports(report_id) ON DELETE CASCADE
+);
+
+
+
+ALTER TABLE Prescriptions ADD COLUMN title VARCHAR(255) AFTER prescription_id;
+ALTER TABLE Patients ADD CONSTRAINT unique_phone UNIQUE (contact_number);

@@ -1,0 +1,91 @@
+-- ==========================================
+-- 1. INSERT HOSPITALS
+-- ==========================================
+-- DHAKA REGION
+INSERT INTO Hospital (name, city, area, contact_info) VALUES 
+('City Care General Hospital', 'Dhaka', 'Mohammadpur', '01711000001'),
+('Hope Specialized Hospital', 'Dhaka', 'Mirpur', '01711000002'),
+('Badda Life Saver Clinic', 'Dhaka', 'Badda', '01711000003'),
+('Dhaka Central Medical', 'Dhaka', 'Mohakhali', '01711000004');
+
+-- RANGPUR REGION (Using districts/towns as areas as requested)
+INSERT INTO Hospital (name, city, area, contact_info) VALUES 
+('Thakurgaon Sadar Hospital', 'Rangpur', 'Thakurgaon', '01711000005'),
+('North Point Medical', 'Rangpur', 'Tetuliya', '01711000006'),
+('Panchagarh Community Hospital', 'Rangpur', 'Panchagarh', '01711000007');
+
+
+-- ==========================================
+-- 2. INSERT USERS (Base Table)
+-- ==========================================
+-- We need users first before we can create Admins, Staff, or Patients
+INSERT INTO Users (name, password_hash, user_type) VALUES 
+('Super Admin', 'admin123_hash', 'Admin'),      -- user_id 1
+('Rahim Staff', 'staff123_hash', 'Staff'),      -- user_id 2 (Mohammadpur)
+('Karim Staff', 'staff123_hash', 'Staff'),      -- user_id 3 (Thakurgaon)
+('John Patient', 'pat123_hash', 'Patient'),     -- user_id 4
+('Jane Doe', 'pat123_hash', 'Patient');         -- user_id 5
+
+-- ==========================================
+-- 3. INSERT ADMINS, STAFF, PATIENTS (Sub-tables)
+-- ==========================================
+INSERT INTO Admins (user_id, address, contact_number) VALUES 
+(1, 'Dhaka Head Office', '01888888888');
+
+-- Linking Staff to Hospitals (Assumes sequential IDs: 1=Mohammadpur, 5=Thakurgaon)
+INSERT INTO Staff (user_id, hospital_id, contact_number) VALUES 
+(2, 1, '01999999991'), -- Rahim works at City Care (Mohammadpur)
+(3, 5, '01999999992'); -- Karim works at Thakurgaon Sadar
+
+INSERT INTO Patients (user_id, address, email, contact_number) VALUES 
+(4, 'House 12, Mirpur', 'john@gmail.com', '01555555551'),
+(5, 'Village Road, Panchagarh', 'jane@gmail.com', '01555555552');
+
+
+-- ==========================================
+-- 4. INSERT DOCTORS
+-- ==========================================
+-- Doctors for DHAKA - Mohammadpur (Hospital ID 1)
+INSERT INTO Doctors (doctor_name, department_name, fee, hospital_id) VALUES 
+('Dr. Ayesha Siddiqua', 'Cardiology', 1000.00, 1),
+('Dr. Rafiqul Islam', 'Neurology', 1200.00, 1);
+
+-- Doctors for DHAKA - Mirpur (Hospital ID 2)
+INSERT INTO Doctors (doctor_name, department_name, fee, hospital_id) VALUES 
+('Dr. Kamal Hossain', 'Orthopedics', 800.00, 2),
+('Dr. Nusrat Jahan', 'Gynecology', 900.00, 2);
+
+-- Doctors for DHAKA - Mohakhali (Hospital ID 4)
+INSERT INTO Doctors (doctor_name, department_name, fee, hospital_id) VALUES 
+('Dr. Anisur Rahman', 'Oncology', 1500.00, 4);
+
+-- Doctors for RANGPUR - Thakurgaon (Hospital ID 5)
+INSERT INTO Doctors (doctor_name, department_name, fee, hospital_id) VALUES 
+('Dr. Bipul Roy', 'General Medicine', 500.00, 5),
+('Dr. Sanjana Khan', 'Pediatrics', 600.00, 5);
+
+-- Doctors for RANGPUR - Tetuliya (Hospital ID 6)
+INSERT INTO Doctors (doctor_name, department_name, fee, hospital_id) VALUES 
+('Dr. Hasan Mahmud', 'Dermatology', 400.00, 6);
+
+
+-- ==========================================
+-- 5. INSERT BEDS
+-- ==========================================
+-- Beds for City Care (Mohammadpur - ID 1)
+INSERT INTO Beds (bed_type, total_count, available_count, cost_per_day, hospital_id) VALUES 
+('General Ward', 20, 15, 500.00, 1),
+('AC Cabin', 10, 5, 2500.00, 1),
+('ICU', 5, 1, 8000.00, 1);
+
+-- Beds for Hope Hospital (Mirpur - ID 2)
+INSERT INTO Beds (bed_type, total_count, available_count, cost_per_day, hospital_id) VALUES 
+('General Ward', 50, 40, 400.00, 2),
+('VIP Cabin', 5, 2, 4500.00, 2);
+
+-- Beds for Thakurgaon Sadar (ID 5)
+INSERT INTO Beds (bed_type, total_count, available_count, cost_per_day, hospital_id) VALUES 
+('General Ward', 100, 80, 200.00, 5),
+('Cabin', 10, 8, 1000.00, 5);
+
+
